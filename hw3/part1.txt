@@ -1,0 +1,119 @@
+(* PROBLEM SET 3 - PART 1 *)
+(* Name: Jeff Mu          *)
+(* NetID: jm776           *)
+
+Step 0)
+  let initial x = 0 in
+  let rec zardoz (f1, lst) =
+    match lst with
+      [] -> 3110
+    | h :: t ->
+        let f x = h * List.length lst in 
+        if List.length t = 0 then f1 0
+        else zardoz (f, t) + f 0
+  in
+    zardoz (initial, [14;0;0])
+
+  let zardoz' = fun (f1, lst) ->   
+    match lst with
+    | [] -> 3110
+    | h :: t ->
+      if List.length t = 0 then f1 0
+      else zardoz' ((fun x -> h * List.length lst), t) + (fun x -> h * List.length lst) 0 in
+  let initial x = 0
+  
+Step 1)   
+  let zardoz = zardoz' in
+    zardoz (initial, [14;0;0])
+  
+Step 2)
+  let zardoz = zardoz' in
+    zardoz ((fun x -> 0), [14;0;0])
+
+Step 3)
+  zardoz' ((fun x -> 0), [14;0;0])
+
+Step 4)
+  (fun (f1, lst) ->   
+    match lst with
+    | [] -> 3110
+    | h :: t ->
+      if List.length t = 0 then f1 0
+      else zardoz' ((fun x -> h * List.length lst), t) 
+      + (fun x -> h * List.length lst) 0) 
+  ((fun x -> 0), [14;0;0])
+
+Step 5)
+  match [14;0;0] with
+    | [] -> 3110
+    | 14 :: [0;0] ->
+    if 2 = 0 then (fun x -> 0) 0
+    else zardoz' ((fun x -> 14 * 3), [0;0]) 
+    + (fun x -> 14 * 3) 0 
+
+Step 6)
+  if false then (fun x -> 0) 0
+  else zardoz' ((fun x -> 42), [0;0]) 
+    + (fun x -> 42) 0 
+
+Step 7)
+  zardoz' ((fun x -> 42), [0;0]) + 42
+
+Step 8)
+  ((fun (f1, lst) ->   
+    match lst with
+    | [] -> 3110
+    | h :: t ->
+      if List.length t = 0 then f1 0
+      else zardoz' ((fun x -> h * List.length lst), t) 
+      + (fun x -> h * List.length lst) 0) 
+  ((fun x -> 42), [0;0])) + 42
+
+Step 9)
+  ((match [0;0] with
+    | [] -> 3110
+    | 0 :: [0] ->
+      if 1 = 0 then (fun x -> 42) 0
+      else zardoz' ((fun x -> 0 * 2), 0) 
+      + (fun x -> 0 * 2) 0) 
+  ) + 42
+
+Step 10)
+  (if false then (fun x -> 42) 0
+    else zardoz' ((fun x -> 0), 0) 
+    + (fun x -> 0) 0
+  ) + 42
+
+Step 11)
+  zardoz' ((fun x -> 0), 0) + 0 + 42
+
+Step 12)
+  ((fun (f1, lst) ->   
+    match lst with
+    | [] -> 3110
+    | h :: t ->
+      if List.length t = 0 then f1 0
+      else zardoz' ((fun x -> h * List.length lst), t) 
+      + (fun x -> h * List.length lst) 0) 
+  ((fun x -> 0), [0;0])) + 0 + 42
+
+Step 13)
+  ((match [0] with
+    | [] -> 3110
+    | 0 :: [] ->
+      if 0 = 0 then (fun x -> 0) 0
+      else zardoz' ((fun x -> 0 * 1), []) 
+      + (fun x -> 0 * 1) 0) 
+  ((fun x -> 0), [0;0])) + 0 + 42
+
+Step 14)
+  (if true then (fun x -> 0) 0
+    else zardoz' ((fun x -> 0 * 1), []) 
+    + (fun x -> 0 * 1) 0) 
+  + 0 + 42
+
+Step 15)
+  0 + 0 + 42
+
+Step 16)
+  42

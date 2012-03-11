@@ -1,3 +1,4 @@
+#use "disjointSet.ml";;
 (* A vertex in the graph is simply labeled by an integer index *)
 type vertex = int
 
@@ -19,26 +20,28 @@ type graph = int * weighted_edge list
  * edges which make up the minimal spanning tree (or forest) *)
 let kruskal (g : graph) : (weighted_edge list) = 
   let n,l = g in
+  let u = createUniverse n in
   let compare_edge e1 e2 = 
     let _,_,w1 = e1
     and _,_,w2 = e2 in
     compare w1 w2 in
   let sorted_edges = List.rev (List.sort compare_edge l) in
-  let rec connected lst e = 
-    match lst with
-      | [] -> false
-      | h::t -> let (v1,v2,_) = h 
-                and (n1,n2,_) = e in
-                if v1=n1 && v2=n2 then true
-                if v1=n1 then connected t 
-                else connected t v1 n1 || connected t v2 n2 in
   let rec helper edges mst = 
     match edges with
       | [] -> mst
-      | h::t -> if connected mst h then helper t mst
-                else helper t (h::mst) in
-  (n, helper sorted_edges [])
-    
+      | h::t -> let (n1,n2,_) = h in 
+								let t1 = find u n1 
+								and t2 = find u n2 in
+								if t1 = t2 then helper t mst
+								else let _ = union u n1 n2 in helper t (h::mst) in
+  helper sorted_edges []
+
+let kruskal_test =
+  kruskal (2,[(0,1,2.0);(1,0,3.0)]);
+  kruskal (3,[(0,1,1.0);(1,2,1.0);(2,0,3.0)]);
+  kruskal (5,[(0,1,1.0);(1,2,1.0);(2,3,1.0);(3,4,1.0);(4,0,1.0);(1,3,1.0);
+							(1,4,1.0);(2,4,1.0);(2,0,1.0);(3,0,1.0)])
+
 (* List of contiguous integers: 1 <|> 5 = [1; 2; 3; 4; 5] *)
 let (<|>) x y =
   let rec loop i acc = if i > y then List.rev acc else loop (i+1) (i::acc) in
@@ -48,8 +51,24 @@ let (<|>) x y =
  * algorithm described in the writeup.
  * Requires: n > 2 *)
 let calc_p_threshold (n:int) : float =
-  failwith "not implemented"
-  
+  let s = n*n in
+  let u = createUniverse s in
+  let top = (<|>) 0 (n-1)
+  and bot = (<|>) (s-n) (s-1) 
+  and occupied = (<|>) n (s-n-1) in
+  let shuffled = List.sort (fun a b -> (Random.int 3) - 1) occupied in 
+  let _ = List.map (union u 0) top 
+  and _ =  List.map (union u (s-1)) bot in
+  let rec perc i = 
+		if i > s-n then false
+  	else ((find u i) = (fund u (s-1))) | perc i+n | perc i+n-1 | perc i+n+1 
+	let rec helper b l = 
+    if b then float_of_int(size u 0)/.float_of_int(s)
+    else let h::t = l in 
+			   let _ = union u 0 h in
+				 helper ((find u 0) = (find u (s-1))) t
+  in helper false shuffled 
+ 
 (* Averages the percolation threshold for an nxn grid
  * over i trials *)  
 let average_p_threshold (n : int) (i : int) : float =

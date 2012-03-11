@@ -57,17 +57,31 @@ let calc_p_threshold (n:int) : float =
   and bot = (<|>) (s-n) (s-1) 
   and occupied = (<|>) n (s-n-1) in
   let shuffled = List.sort (fun a b -> (Random.int 3) - 1) occupied in 
-  let _ = List.map (union u 0) top 
-  and _ =  List.map (union u (s-1)) bot in
-  let rec perc i = 
-		if i > s-n then false
-  	else ((find u i) = (fund u (s-1))) | perc i+n | perc i+n-1 | perc i+n+1 
-	let rec helper b l = 
+  let _ = List.map (union u 0) top in
+  let _ =  List.map (union u (s-1)) bot in
+  let perc i v = 
+    let help i =
+      let t = find u 0 
+      and b = find u (s-1) in
+      let up = find u (i-n)
+      and dn = find u (i+n) 
+      and lt = find u (i-(if (i mod n) = 0 then 0 else 1)) 
+      and rt = find u (i+(if (i mod n) = (n-1) then 0 else 1)) in
+      (*let _ = print_string ((string_of_int t) ^ " " ^ (string_of_int b) ^ " " ^
+      (string_of_int up) ^ " " ^ (string_of_int dn) ^ " " ^ (string_of_int lt) ^ " " ^
+      (string_of_int rt) ^ "\n") in*)
+      let _ = if (t = up || t = dn || t = lt || t = rt) then union u 0 i in
+      let _ = if (b = up || b = dn || b = lt || b = rt) then union u (s-1) i in
+      (t = up || t = dn || t = lt || t = rt) && (b = up || b = dn || b = lt || b = rt) in
+    let nv = List.fold_left (fun x h -> if (help h) then x else (h::x)) [] (i::v) in
+    (((find u 0) = (find u (s-1))),nv) in
+	let rec helper b l v = 
     if b then float_of_int(size u 0)/.float_of_int(s)
     else let h::t = l in 
-			   let _ = union u 0 h in
-				 helper ((find u 0) = (find u (s-1))) t
-  in helper false shuffled 
+			   (*let _ = print_string ((string_of_int h) ^ "\n") in*)
+         let b1,v1 = perc h v in
+         helper b1 t v1
+  in helper false shuffled []
  
 (* Averages the percolation threshold for an nxn grid
  * over i trials *)  

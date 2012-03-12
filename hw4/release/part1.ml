@@ -53,38 +53,40 @@ let (<|>) x y =
 let calc_p_threshold (n:int) : float =
   let s = n*n in
   let u = createUniverse s in
+  let u2 = createUniverse s in
+  let _ = Random.self_init in
   let top = (<|>) 0 (n-1)
   and bot = (<|>) (s-n) (s-1) 
   and occupied = (<|>) n (s-n-1) in
-  let shuffled = List.sort (fun a b -> (Random.int 3) - 1) occupied in 
+  let shuffle = List.sort (fun a b -> (Random.int 3) - 1) in 
   let _ = List.map (union u 0) top in
-  let _ =  List.map (union u (s-1)) bot in
-  let perc i v = 
-    let help i =
-      let t = find u 0 
-      and b = find u (s-1) in
-      let up = find u (i-n)
-      and dn = find u (i+n) 
-      and lt = find u (i-(if (i mod n) = 0 then 0 else 1)) 
-      and rt = find u (i+(if (i mod n) = (n-1) then 0 else 1)) in
-      (*let _ = print_string ((string_of_int t) ^ " " ^ (string_of_int b) ^ " " ^
-      (string_of_int up) ^ " " ^ (string_of_int dn) ^ " " ^ (string_of_int lt) ^ " " ^
-      (string_of_int rt) ^ "\n") in*)
-      let _ = if (t = up || t = dn || t = lt || t = rt) then union u 0 i in
-      let _ = if (b = up || b = dn || b = lt || b = rt) then union u (s-1) i in
-      (t = up || t = dn || t = lt || t = rt) && (b = up || b = dn || b = lt || b = rt) in
-    let nv = List.fold_left (fun x h -> if (help h) then x else (h::x)) [] (i::v) in
-    (((find u 0) = (find u (s-1))),nv) in
-	let rec helper b l v = 
+  let _ = List.map (union u (s-1)) bot in
+  let _ = List.map (union u2 0) top in
+  let _ = List.map (union u2 0) bot in
+  let make_vacant i = 
+    let up = find u (i-n)
+    and dn = find u (i+n) 
+    and lt = find u (i-(if (i mod n) = 0 then 0 else 1)) 
+    and rt = find u (i+(if (i mod n) = (n-1) then 0 else 1)) in
+    (*let _ = print_string ((string_of_int t) ^ " " ^ (string_of_int b) ^ " " ^
+    (string_of_int up) ^ " " ^ (string_of_int dn) ^ " " ^ (string_of_int lt) ^ " " ^
+    (string_of_int rt) ^ "\n") in*)
+		let _ = if ((find u2 up) = 0) then union u up i in
+		let _ = if ((find u2 dn) = 0) then union u dn i in
+		let _ = if ((find u2 lt) = 0) then union u lt i in
+		let _ = if ((find u2 rt) = 0) then union u rt i in
+    () in
+	let rec helper b h = 
     if b then float_of_int(size u 0)/.float_of_int(s)
-    else let h::t = l in 
+    else (*let h::t = l in *)
 			   (*let _ = print_string ((string_of_int h) ^ "\n") in*)
-         let b1,v1 = perc h v in
-         helper b1 t v1
-  in helper false shuffled []
- 
+ 				 let _ = union u2 0 h in
+         let _ = make_vacant h in
+         helper ((find u 0) = (find u (s-1))) ((Random.int (s-(2*n)-1))+n)(*(shuffle t)*) in
+  helper false ((Random.int (s-(2*n)-1)+n))(*(shuffle occupied)*)
+
 (* Averages the percolation threshold for an nxn grid
  * over i trials *)  
 let average_p_threshold (n : int) (i : int) : float =
   let runs = List.map (fun _ -> calc_p_threshold n) (1 <|> i) in
-  (List.fold_left (+.) 0. runs) /. (float_of_int i)
+ (List.fold_left (+.) 0. runs) /. (float_of_int i)

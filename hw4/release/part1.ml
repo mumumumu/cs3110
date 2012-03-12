@@ -58,7 +58,12 @@ let calc_p_threshold (n:int) : float =
   let top = (<|>) 0 (n-1)
   and bot = (<|>) (s-n) (s-1) 
   and occupied = (<|>) n (s-n-1) in
-  let shuffle = List.sort (fun a b -> (Random.int 3) - 1) in 
+  let occupied_array = Array.of_list occupied in
+  let swap a i j = let t = a.(i) in a.(i) <- a.(j); a.(j) <- t in
+  let shuffle a = Array.iteri (fun i _ -> swap a i (Random.int (i+1))) a in
+  (*let shuffle = List.sort (fun a b -> (Random.int 3) - 1) in *)
+  let _ = shuffle occupied_array in
+  let occupied_list = Array.to_list occupied_array in
   let _ = List.map (union u 0) top in
   let _ = List.map (union u (s-1)) bot in
   let _ = List.map (union u2 0) top in
@@ -78,12 +83,12 @@ let calc_p_threshold (n:int) : float =
     () in
 	let rec helper l = 
     if ((find u 0) = (find u (s-1))) then float_of_int(size u 0)/.float_of_int(s)
-    else (*let h::t = l in *)
+    else let h::t = l in
 			   (*let _ = print_string ((string_of_int h) ^ "\n") in*)
- 				 let _ = union u2 0 l in
-         let _ = make_vacant l in
-         helper ((Random.int (s-(2*n)-1))+n)(*(shuffle t)*) in
-  helper ((Random.int (s-(2*n)-1)+n))(*(shuffle occupied)*)
+ 				 let _ = union u2 0 h in
+         let _ = make_vacant h in
+         helper (*((Random.int (s-(2*n)-1))+n)*) t in
+  helper (*((Random.int (s-(2*n)-1)+n))*)occupied_list
   
   let calc_p_threshold2 (n:int) : float =
   let s = n*n in

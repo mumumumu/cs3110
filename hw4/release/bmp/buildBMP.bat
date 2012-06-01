@@ -1,1 +1,0 @@
-ocamlc region.mli region.ml mstring.mli mstring.ml tmpfile.mli tmpfile.ml bitmap.mli bitmap.ml  color.mli color.ml genimage.mli genimage.ml info.mli rgba32.mli rgba32.ml rgb24.mli rgb24.ml index16.mli index16.ml index8.mli index8.ml cmyk32.mli cmyk32.ml images.mli images.ml bmp.mli bmp.ml -a -o bmp.cma
